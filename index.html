@@ -745,35 +745,41 @@
                             tile = prevTile;
                             const prevValue = parseInt(tile.dataset.value) || 0;
                             
+                            tile.classList.remove('tile-2', 'tile-4', 'tile-8', 'tile-16', 'tile-32', 'tile-64', 'tile-128', 'tile-256', 'tile-512', 'tile-1024', 'tile-2048', 'tile-4096');
+                            
+                            if (value > 0) {
+                                tile.classList.add(`tile-${value}`);
+                            }
+                            
                             if (value !== prevValue) {
                                 tile.classList.remove('tile-new', 'tile-merged');
                                 
                                 if (value > 0) {
                                     if (isMerged) {
-                                        tile.classList.add('tile-merged');
-                                    } else {
-                                        tile.classList.add('tile-new');
+                                        setTimeout(() => tile.classList.add('tile-merged'), 10);
+                                    } else if (prevValue === 0) {
+                                        setTimeout(() => tile.classList.add('tile-new'), 10);
                                     }
                                 }
                             }
                             
                             tile.dataset.value = value;
-                            tile.className = `tile${value ? ` tile-${value}` : ''}`;
-                            if (isMerged) tile.classList.add('tile-merged');
-                            else if (value && prevValue === 0) tile.classList.add('tile-new');
-                            
                             tile.textContent = value || '';
                         } else {
                             tile = document.createElement('div');
-                            tile.className = `tile${value ? ` tile-${value} tile-new` : ''}`;
-                            tile.textContent = value || '';
+                            tile.className = 'tile';
                             tile.dataset.value = value;
                             
-                            if (isMerged) {
-                                tile.classList.remove('tile-new');
-                                tile.classList.add('tile-merged');
+                            if (value > 0) {
+                                tile.classList.add(`tile-${value}`);
+                                if (isMerged) {
+                                    setTimeout(() => tile.classList.add('tile-merged'), 10);
+                                } else {
+                                    setTimeout(() => tile.classList.add('tile-new'), 10);
+                                }
                             }
                             
+                            tile.textContent = value || '';
                             this.gameContainer.appendChild(tile);
                         }
                         
