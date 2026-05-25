@@ -729,28 +729,68 @@
             }
 
             render(mergedPositions = []) {
-                this.gameContainer.innerHTML = '';
                 this.gameContainer.style.gridTemplateColumns = `repeat(${this.size}, 1fr)`;
+                
+                const currentTiles = this.gameContainer.querySelectorAll('.tile');
+                let tileIndex = 0;
                 
                 for (let i = 0; i < this.size; i++) {
                     for (let j = 0; j < this.size; j++) {
-                        const tile = document.createElement('div');
-                        tile.className = `tile${this.grid[i][j] ? ` tile-${this.grid[i][j]} tile-new` : ''}`;
-                        tile.textContent = this.grid[i][j] || '';
-                        
+                        let tile;
+                        const value = this.grid[i][j];
                         const isMerged = mergedPositions.some(p => p.row === i && p.col === j);
-                        if (isMerged) {
-                            tile.classList.remove('tile-new');
-                            tile.classList.add('tile-merged');
+                        const prevTile = currentTiles[tileIndex];
+                        
+                        if (prevTile) {
+                            tile = prevTile;
+                            const prevValue = parseInt(tile.dataset.value) || 0;
+                            
+                            if (value !== prevValue) {
+                                tile.classList.remove('tile-new', 'tile-merged');
+                                
+                                if (value > 0) {
+                                    if (isMerged) {
+                                        tile.classList.add('tile-merged');
+                                    } else {
+                                        tile.classList.add('tile-new');
+                                    }
+                                }
+                            }
+                            
+                            tile.dataset.value = value;
+                            tile.className = `tile${value ? ` tile-${value}` : ''}`;
+                            if (isMerged) tile.classList.add('tile-merged');
+                            else if (value && prevValue === 0) tile.classList.add('tile-new');
+                            
+                            tile.textContent = value || '';
+                        } else {
+                            tile = document.createElement('div');
+                            tile.className = `tile${value ? ` tile-${value} tile-new` : ''}`;
+                            tile.textContent = value || '';
+                            tile.dataset.value = value;
+                            
+                            if (isMerged) {
+                                tile.classList.remove('tile-new');
+                                tile.classList.add('tile-merged');
+                            }
+                            
+                            this.gameContainer.appendChild(tile);
                         }
                         
-                        this.gameContainer.appendChild(tile);
+                        tileIndex++;
                     }
                 }
                 
-                mergedPositions.forEach(pos => {
-                    this.showFloatingScore(pos.row, pos.col, pos.value);
-                });
+                while (tileIndex < currentTiles.length) {
+                    currentTiles[tileIndex].remove();
+                    tileIndex++;
+                }
+                
+                setTimeout(() => {
+                    mergedPositions.forEach(pos => {
+                        this.showFloatingScore(pos.row, pos.col, pos.value);
+                    });
+                }, 50);
             }
 
             showFloatingScore(row, col, value) {
