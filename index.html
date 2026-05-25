@@ -779,93 +779,46 @@
             render(mergedPositions = []) {
                 this.gameContainer.style.gridTemplateColumns = `repeat(${this.size}, 1fr)`;
                 
-                const currentTiles = this.gameContainer.querySelectorAll('.tile');
-                let tileIndex = 0;
+                const oldTiles = this.gameContainer.querySelectorAll('.tile');
+                const oldValues = [];
+                oldTiles.forEach(tile => {
+                    oldValues.push(parseInt(tile.dataset.value) || 0);
+                });
                 
-                const slideClasses = ['slide-up', 'slide-down', 'slide-left', 'slide-right'];
+                this.gameContainer.innerHTML = '';
                 
+                let globalIndex = 0;
                 for (let i = 0; i < this.size; i++) {
                     for (let j = 0; j < this.size; j++) {
-                        let tile;
                         const value = this.grid[i][j];
                         const isMerged = mergedPositions.some(p => p.row === i && p.col === j);
-                        const prevTile = currentTiles[tileIndex];
+                        const oldValue = oldValues[globalIndex] || 0;
                         
-                        if (prevTile) {
-                            tile = prevTile;
-                            const prevValue = parseInt(tile.dataset.value) || 0;
+                        const tile = document.createElement('div');
+                        tile.className = 'tile';
+                        tile.dataset.value = value;
+                        tile.textContent = value || '';
+                        
+                        if (value > 0) {
+                            tile.classList.add(`tile-${value}`);
                             
-                            slideClasses.forEach(cls => tile.classList.remove(cls));
-                            tile.classList.remove('tile-2', 'tile-4', 'tile-8', 'tile-16', 'tile-32', 'tile-64', 'tile-128', 'tile-256', 'tile-512', 'tile-1024', 'tile-2048', 'tile-4096');
-                            
-                            if (value > 0) {
-                                tile.classList.add(`tile-${value}`);
+                            if (isMerged) {
+                                tile.classList.add('tile-merged');
+                            } else if (oldValue === 0) {
+                                tile.classList.add('tile-new');
                             }
-                            
-                            if (value !== prevValue) {
-                                tile.classList.remove('tile-new', 'tile-merged');
-                                
-                                if (value > 0) {
-                                    if (isMerged) {
-                                        setTimeout(() => tile.classList.add('tile-merged'), 10);
-                                    } else if (prevValue === 0) {
-                                        const directionMap = {
-                                            'up': 'slide-down',
-                                            'down': 'slide-up',
-                                            'left': 'slide-right',
-                                            'right': 'slide-left'
-                                        };
-                                        const slideClass = directionMap[this.lastDirection] || 'slide-up';
-                                        setTimeout(() => {
-                                            tile.classList.add('tile-new', slideClass);
-                                        }, 10);
-                                    }
-                                }
-                            }
-                            
-                            tile.dataset.value = value;
-                            tile.textContent = value || '';
-                        } else {
-                            tile = document.createElement('div');
-                            tile.className = 'tile';
-                            tile.dataset.value = value;
-                            
-                            if (value > 0) {
-                                tile.classList.add(`tile-${value}`);
-                                if (isMerged) {
-                                    setTimeout(() => tile.classList.add('tile-merged'), 10);
-                                } else {
-                                    const directionMap = {
-                                        'up': 'slide-down',
-                                        'down': 'slide-up',
-                                        'left': 'slide-right',
-                                        'right': 'slide-left'
-                                    };
-                                    const slideClass = directionMap[this.lastDirection] || 'slide-up';
-                                    setTimeout(() => {
-                                        tile.classList.add('tile-new', slideClass);
-                                    }, 10);
-                                }
-                            }
-                            
-                            tile.textContent = value || '';
-                            this.gameContainer.appendChild(tile);
                         }
                         
-                        tileIndex++;
+                        this.gameContainer.appendChild(tile);
+                        globalIndex++;
                     }
-                }
-                
-                while (tileIndex < currentTiles.length) {
-                    currentTiles[tileIndex].remove();
-                    tileIndex++;
                 }
                 
                 setTimeout(() => {
                     mergedPositions.forEach(pos => {
                         this.showFloatingScore(pos.row, pos.col, pos.value);
                     });
-                }, 50);
+                }, 100);
             }
 
             showFloatingScore(row, col, value) {
