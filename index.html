@@ -787,6 +787,8 @@
                 
                 this.gameContainer.innerHTML = '';
                 
+                const tilesToAnimate = [];
+                
                 let globalIndex = 0;
                 for (let i = 0; i < this.size; i++) {
                     for (let j = 0; j < this.size; j++) {
@@ -803,9 +805,9 @@
                             tile.classList.add(`tile-${value}`);
                             
                             if (isMerged) {
-                                tile.classList.add('tile-merged');
+                                tilesToAnimate.push({ tile: tile, type: 'merged' });
                             } else if (oldValue === 0) {
-                                tile.classList.add('tile-new');
+                                tilesToAnimate.push({ tile: tile, type: 'new' });
                             }
                         }
                         
@@ -813,6 +815,16 @@
                         globalIndex++;
                     }
                 }
+                
+                setTimeout(() => {
+                    tilesToAnimate.forEach(item => {
+                        if (item.type === 'merged') {
+                            item.tile.classList.add('tile-merged');
+                        } else {
+                            item.tile.classList.add('tile-new');
+                        }
+                    });
+                }, 50);
                 
                 setTimeout(() => {
                     mergedPositions.forEach(pos => {
