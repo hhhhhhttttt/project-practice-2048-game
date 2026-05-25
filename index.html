@@ -779,58 +779,53 @@
             render(mergedPositions = []) {
                 this.gameContainer.style.gridTemplateColumns = `repeat(${this.size}, 1fr)`;
                 
-                const oldTiles = this.gameContainer.querySelectorAll('.tile');
                 const oldValues = [];
-                oldTiles.forEach(tile => {
-                    oldValues.push(parseInt(tile.dataset.value) || 0);
-                });
-                
-                this.gameContainer.innerHTML = '';
-                
-                const tilesToAnimate = [];
-                
-                let globalIndex = 0;
+                const oldTiles = this.gameContainer.querySelectorAll('.tile');
                 for (let i = 0; i < this.size; i++) {
                     for (let j = 0; j < this.size; j++) {
-                        const value = this.grid[i][j];
-                        const isMerged = mergedPositions.some(p => p.row === i && p.col === j);
-                        const oldValue = oldValues[globalIndex] || 0;
-                        
-                        const tile = document.createElement('div');
-                        tile.className = 'tile';
-                        tile.dataset.value = value;
-                        tile.textContent = value || '';
-                        
-                        if (value > 0) {
-                            tile.classList.add(`tile-${value}`);
-                            
-                            if (isMerged) {
-                                tilesToAnimate.push({ tile: tile, type: 'merged' });
-                            } else if (oldValue === 0) {
-                                tilesToAnimate.push({ tile: tile, type: 'new' });
-                            }
-                        }
-                        
-                        this.gameContainer.appendChild(tile);
-                        globalIndex++;
+                        const idx = i * this.size + j;
+                        oldValues.push(idx < oldTiles.length ? (parseInt(oldTiles[idx].dataset.value) || 0) : 0);
                     }
                 }
                 
-                setTimeout(() => {
-                    tilesToAnimate.forEach(item => {
-                        if (item.type === 'merged') {
-                            item.tile.classList.add('tile-merged');
-                        } else {
-                            item.tile.classList.add('tile-new');
-                        }
-                    });
-                }, 50);
+                this.gameContainer.innerHTML = '';
                 
-                setTimeout(() => {
-                    mergedPositions.forEach(pos => {
-                        this.showFloatingScore(pos.row, pos.col, pos.value);
-                    });
-                }, 100);
+                const animateNew = [];
+                const animateMerged = [];
+                
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        const value = this.grid[i][j];
+                        const idx = i * this.size + j;
+                        const oldValue = oldValues[idx] || 0;
+                        const isMerged = mergedPositions && mergedPositions.some(p => p.row === i && p.col === j);
+                        
+                        const tile = document.createElement('div');
+                        tile.className = `tile ${value > 0 ? `tile-${value}` : ''}`;
+                        tile.dataset.value = value;
+                        tile.textContent = value || '';
+                        
+                        if (value > 0 && oldValue === 0) {
+                            animateNew.push(tile);
+                        }
+                        if (isMerged) {
+                            animateMerged.push(tile);
+                        }
+                        
+                        this.gameContainer.appendChild(tile);
+                    }
+                }
+                
+                requestAnimationFrame(() => {
+                    animateNew.forEach(tile => tile.classList.add('tile-new'));
+                    animateMerged.forEach(tile => tile.classList.add('tile-merged'));
+                    
+                    setTimeout(() => {
+                        mergedPositions && mergedPositions.forEach(pos => {
+                            this.showFloatingScore(pos.row, pos.col, pos.value);
+                        });
+                    }, 50);
+                });
             }
 
             showFloatingScore(row, col, value) {
