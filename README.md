@@ -91,3 +91,7 @@ MIT License
 ## 🤝 贡献
 
 欢迎提交Issue和Pull Request！
+
+---
+
+*版本: v1.1.0* | *最后更新: 2026-05-26*
