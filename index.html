@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>2468 游戏 - 经典数字合并挑战</title>
+    <title>2048 游戏 - 经典数字合并挑战</title>
     <style>
         * {
             margin: 0;
@@ -293,21 +293,13 @@
 
         .tile-2 { background: linear-gradient(135deg, #eee4da, #ddd0c4); color: #776e65; }
         .tile-4 { background: linear-gradient(135deg, #ede0c8, #ddd1b5); color: #776e65; }
-        .tile-6 { background: linear-gradient(135deg, #f2b179, #e8a360); color: #fff; }
         .tile-8 { background: linear-gradient(135deg, #f2b179, #f59563); color: #fff; }
-        .tile-12 { background: linear-gradient(135deg, #f67c5f, #f56b4e); color: #fff; }
         .tile-16 { background: linear-gradient(135deg, #f65e3b, #e5532f); color: #fff; }
-        .tile-24 { background: linear-gradient(135deg, #edcf72, #e5c761); color: #fff; }
         .tile-32 { background: linear-gradient(135deg, #edcc61, #e5c450); color: #fff; }
-        .tile-48 { background: linear-gradient(135deg, #edc850, #e5be3f); color: #fff; }
         .tile-64 { background: linear-gradient(135deg, #edc53f, #e5ba2e); color: #fff; }
-        .tile-96 { background: linear-gradient(135deg, #ff6b6b, #ff5252); color: #fff; }
         .tile-128 { background: linear-gradient(135deg, #a855f7, #9333ea); color: #fff; font-size: clamp(1.2rem, 6vw, 2rem); }
-        .tile-192 { background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; font-size: clamp(1.2rem, 6vw, 2rem); }
         .tile-256 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; font-size: clamp(1.2rem, 6vw, 2rem); }
-        .tile-384 { background: linear-gradient(135deg, #ec4899, #db2777); color: #fff; font-size: clamp(1.2rem, 6vw, 2rem); }
         .tile-512 { background: linear-gradient(135deg, #f43f5e, #e11d48); color: #fff; font-size: clamp(1.2rem, 6vw, 2rem); }
-        .tile-768 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; font-size: clamp(1rem, 5vw, 1.8rem); }
         .tile-1024 { background: linear-gradient(135deg, #34d399, #10b981); color: #fff; font-size: clamp(0.9rem, 4.5vw, 1.5rem); }
         .tile-2048 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; font-size: clamp(0.9rem, 4.5vw, 1.5rem); }
         .tile-super { background: linear-gradient(135deg, #1e293b, #0f172a); color: #fff; font-size: clamp(0.8rem, 4vw, 1.3rem); }
@@ -598,7 +590,7 @@
     
     <div class="container">
         <div class="header">
-            <h1>2468</h1>
+            <h1>2048</h1>
             <p class="subtitle">经典数字合并挑战</p>
             <div class="ai-badge">🤖 AI增强版</div>
         </div>
@@ -691,7 +683,7 @@
 
             <div class="feature-content" id="helpContent">
                 <div class="instructions">
-                    <p><strong>🎯 目标：</strong>合并相同数字，挑战2468！</p>
+                    <p><strong>🎯 目标：</strong>合并相同数字，挑战2048！</p>
                     <p><strong>⌨️ 操作：</strong>使用键盘方向键 ↑↓←→ 或手机滑动</p>
                     <p><strong>🔄 合并规则：</strong>相同数字相加（如2+2=4, 4+4=8）</p>
                     <p><strong>🎮 功能：</strong></p>
@@ -709,12 +701,12 @@
     <p class="touch-hint">📱 手机端请使用滑动手势控制</p>
 
     <script>
-        class Game2468 {
+        class Game2048 {
             constructor() {
                 this.size = 4;
                 this.grid = [];
                 this.score = 0;
-                this.bestScore = parseInt(localStorage.getItem('bestScore2468') || '0');
+                this.bestScore = parseInt(localStorage.getItem('bestScore') || '0');
                 this.isPaused = false;
                 this.isGameOver = false;
                 this.moveHistory = [];
@@ -859,8 +851,7 @@
                 
                 if (empty.length > 0) {
                     const { row, col } = empty[Math.floor(Math.random() * empty.length)];
-                    const values = [2, 2, 4, 4, 6, 8];
-                    this.grid[row][col] = values[Math.floor(Math.random() * values.length)];
+                    this.grid[row][col] = Math.random() < 0.9 ? 2 : 4;
                 }
             }
 
@@ -1004,7 +995,7 @@
                 this.scoreEl.textContent = this.score;
                 if (this.score > this.bestScore) {
                     this.bestScore = this.score;
-                    localStorage.setItem('bestScore2468', this.bestScore.toString());
+                    localStorage.setItem('bestScore', this.bestScore.toString());
                     this.playSound('highscore');
                 }
                 this.bestScoreEl.textContent = this.bestScore;
@@ -1016,7 +1007,7 @@
 
                 for (let i = 0; i < this.size; i++) {
                     for (let j = 0; j < this.size; j++) {
-                        if (this.grid[i][j] >= 2468) won = true;
+                        if (this.grid[i][j] === 2048) won = true;
                         if (this.grid[i][j] === 0) lost = false;
                         if (j + 1 < this.size && this.grid[i][j] === this.grid[i][j + 1]) lost = false;
                         if (i + 1 < this.size && this.grid[i][j] === this.grid[i + 1][j]) lost = false;
@@ -1112,7 +1103,7 @@
             }
 
             saveToLeaderboard() {
-                let leaderboard = JSON.parse(localStorage.getItem('leaderboard2468') || '[]');
+                let leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
                 
                 leaderboard.push({
                     score: this.score,
@@ -1123,12 +1114,12 @@
                 leaderboard.sort((a, b) => b.score - a.score);
                 leaderboard = leaderboard.slice(0, 10);
                 
-                localStorage.setItem('leaderboard2468', JSON.stringify(leaderboard));
+                localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
                 this.loadLeaderboard();
             }
 
             loadLeaderboard() {
-                const leaderboard = JSON.parse(localStorage.getItem('leaderboard2468') || '[]');
+                const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
                 const container = document.getElementById('leaderboard');
                 
                 if (leaderboard.length === 0) {
@@ -1235,7 +1226,7 @@
             }
         }
 
-        const game = new Game2468();
+        const game = new Game2048();
         
         document.querySelectorAll('.theme-btn')[0].click();
     </script>
